@@ -1,0 +1,30 @@
+Anahtar,Turkish,English,Spanish,French,German,Italian
+tr,Türkçe,Turkish,turc,turc,Türkisch,turco
+en,İngilizce,English,Anglais,Anglais,Englisch,Inglese
+es,İspanyol,Spanish,Espagnol,Espagnol,Spanisch,spagnolo
+fr,Fransızca,French,Français,Français,Französisch,francese
+de,Almanca,German,Allemand,Allemand,Deutsch,tedesco
+it,İtalyan,Italian,italien,italien,Italienisch,Italiano
+,,,,,,
+settings.general,Genel,General,Général,Général,Allgemein,Generale
+settings.video,Video,Video,Vidéo,Vidéo,Video,Video
+settings.audio,Ses,Audio,Audio,Audio,Audio,Audio
+settings.other,Diğer,Other,Autre,Autre,Andere,Altro
+,,,,,,
+settings.resolution,Çözünürlük,Resolution,Résolution,Résolution,Auflösung,Risoluzione
+settings.refreshrate,Yenileme Hızı,Refresh Rate,Taux de rafraîchissement,Taux de rafraîchissement,Bildwiederholfrequenz,Frequenza di aggiornamento
+settings.quality,Kalite,Quality,Qualité,Qualité,Qualität,Qualità
+settings.vsync,V-Senkronizasyonu,V-Sync,V-Sync,V-Sync,V-Sync,Sincronizzazione verticale
+settings.fullscreen,Tam ekran,Full Screen,Plein écran,Plein écran,Vollbildmodus,A schermo intero
+settings.language,Dil,Language,Langue,Langue,Sprache,Lingua
+settings.fov,Görüş Alanı,Field of View,Champ de vision,Champ de vision,Sichtfeld,Campo visivo
+settings.sensitivity,Hassasiyet,Sensitivity,Sensibilité,Sensibilité,Empfindlichkeit,Sensibilità
+settings.apply,Uygula,Apply,Appliquer,Appliquer,Anwenden,Fare domanda a
+button.startgame,Oyuna Başla,Start Game,Démarrer la partie,Démarrer la partie,Spiel starten,Inizia il gioco
+button.newgame,Yeni Oyun,New Game,Nouveau jeu,Nouveau jeu,Neues Spiel,Nuovo gioco
+button.hit,Vurmak,Hit,Frapper,Frapper,Schlag,Colpo
+button.stand,Durmak,Stand,Rester,Rester,Stand,In piedi
+,,,,,,
+result.playerwin,Kazandınız,You Win,Vous avez gagné,Vous avez gagné,Du gewinnst!,Hai vinto
+result.dealerwin,Bayi Kazandı,Dealer Wins,Le croupier gagne,Le croupier gagne,Der Dealer gewinnt.,Il dealer vince
+result.tie,İtmek,Push,Pousser,Pousser,Drücken,Spingere
