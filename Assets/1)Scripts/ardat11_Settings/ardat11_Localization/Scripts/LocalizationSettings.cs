@@ -5,24 +5,24 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "LocalizationSettings", menuName = "Localization/Settings")]
-public class LocalizationSettings : ScriptableObject
+namespace ardat11_Localization
 {
-    [Header("Google Sheets Config")]
-    [Tooltip("Add multiple CSV links for different tabs/sheets here.")]
-    public List<string> googleSheetsUrls = new List<string>();
-    
-    [Header("Language Setup")]
-    public string defaultLanguage = "en";
-    public List<string> languageCodes = new List<string>();
-
-    [Header("Storage")]
-    public string saveFileName = "LocalizationData";
-
-    private void OnValidate()
+    [CreateAssetMenu(fileName = "LocalizationSettings", menuName = "Localization/Settings")]
+    public class LocalizationSettings : ScriptableObject
     {
+        [Header("Google Sheets Config")] [Tooltip("Add multiple CSV links for different tabs/sheets here.")]
+        public List<string> googleSheetsUrls = new List<string>();
+
+        [Header("Language Setup")] public string defaultLanguage = "en";
+        public List<string> languageCodes = new List<string>();
+
+        [Header("Storage")] public string saveFileName = "LocalizationData";
+
+        private void OnValidate()
+        {
 #if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(this);
 #endif
+        }
     }
 }

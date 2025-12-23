@@ -1,31 +1,33 @@
 using UnityEngine;
 using TMPro;
 
-[RequireComponent(typeof(TextMeshProUGUI))]
-public class LocalizedText : MonoBehaviour
+namespace ardat11_Localization
 {
-    [Header("Settings")]
-    public string localizationKey;
-    
-    [SerializeField] private TextMeshProUGUI _tmp;
-    
-
-    private void OnEnable()
+    [RequireComponent(typeof(TextMeshProUGUI))]
+    public class LocalizedText : MonoBehaviour
     {
-        LocalizationManager.OnLanguageChanged += Refresh;
-        Refresh();
-    }
+        [Header("Settings")] public string localizationKey;
 
-    private void OnDisable()
-    {
-        LocalizationManager.OnLanguageChanged -= Refresh;
-    }
+        [SerializeField] private TextMeshProUGUI _tmp;
 
-    public void Refresh()
-    {
-        if (_tmp != null)
+
+        private void OnEnable()
         {
-            _tmp.text = LocalizationManager.Localize(localizationKey);
+            LocalizationManager.OnLanguageChanged += Refresh;
+            Refresh();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= Refresh;
+        }
+
+        public void Refresh()
+        {
+            if (_tmp != null)
+            {
+                _tmp.text = LocalizationManager.Localize(localizationKey);
+            }
         }
     }
 }

@@ -1,10 +1,9 @@
 using System.IO;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Localization.Editor
+namespace ardat11_Localization
 {
     public class LocalizationEditor : EditorWindow
     {
