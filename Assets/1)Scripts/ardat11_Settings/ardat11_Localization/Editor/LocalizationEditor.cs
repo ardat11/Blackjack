@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -8,6 +9,10 @@ namespace ardat11_Localization
     public class LocalizationEditor : EditorWindow
     {
         private LocalizationSettings settings;
+        private Queue<string> downloadQueue = new Queue<string>();
+        private string combinedContent = "";
+        private int totalToDownload;
+        private int currentDownloadedCount;
 
         [MenuItem("Tools/Localization/Open Sync Window")]
         public static void ShowWindow() => GetWindow<LocalizationEditor>("Localizer Sync");
@@ -23,7 +28,7 @@ namespace ardat11_Localization
 
             if (GUILayout.Button("Download & Merge All Sheets"))
             {
-                DownloadCSV();
+                StartDownload();
             }
 
             GUI.color = Color.red; 
@@ -34,60 +39,82 @@ namespace ardat11_Localization
             GUI.color = Color.white;
         }
 
-        private void DownloadCSV()
+        private void StartDownload()
         {
-            string combinedContent = "";
-            int successfulDownloads = 0;
+            combinedContent = "";
+            downloadQueue = new Queue<string>(settings.googleSheetsUrls);
+            totalToDownload = downloadQueue.Count;
+            currentDownloadedCount = 0;
+            
+            if (totalToDownload == 0) return;
 
-            foreach (string url in settings.googleSheetsUrls)
+            ProcessNextInQueue();
+        }
+
+        private void ProcessNextInQueue()
+        {
+            if (downloadQueue.Count == 0)
             {
-                if (string.IsNullOrEmpty(url)) continue;
-
-                UnityWebRequest www = UnityWebRequest.Get(url);
-                var op = www.SendWebRequest();
-                while (!op.isDone) { }
-
-                if (www.result == UnityWebRequest.Result.Success)
-                {
-                    string content = www.downloadHandler.text;
-
-                    // Skip header row for subsequent sheets to avoid duplicate keys
-                    if (successfulDownloads > 0)
-                    {
-                        int firstNewLine = content.IndexOf('\n');
-                        if (firstNewLine != -1) content = content.Substring(firstNewLine + 1);
-                    }
-
-                    combinedContent += content + "\n";
-                    successfulDownloads++;
-                }
-            }
-
-            if (successfulDownloads > 0)
-            {
+                EditorUtility.ClearProgressBar();
                 SaveFile(combinedContent);
-                Debug.Log($"<color=green>Success!</color> {successfulDownloads} sheets merged and downloaded.");
+                return;
             }
+
+            // Show progress in Unity
+            float progress = (float)currentDownloadedCount / totalToDownload;
+            EditorUtility.DisplayProgressBar("Localization Sync", $"Downloading sheet {currentDownloadedCount + 1} of {totalToDownload}...", progress);
+
+            string url = downloadQueue.Dequeue();
+            if (string.IsNullOrEmpty(url))
+            {
+                currentDownloadedCount++;
+                ProcessNextInQueue();
+                return;
+            }
+
+            UnityWebRequest www = UnityWebRequest.Get(url);
+            var operation = www.SendWebRequest();
+
+            EditorApplication.CallbackFunction updateCallback = null;
+            updateCallback = () =>
+            {
+                if (operation.isDone)
+                {
+                    EditorApplication.update -= updateCallback;
+                    if (www.result == UnityWebRequest.Result.Success)
+                    {
+                        string content = www.downloadHandler.text;
+                        if (combinedContent != "")
+                        {
+                            int firstLine = content.IndexOf('\n');
+                            if (firstLine != -1) content = content.Substring(firstLine + 1);
+                        }
+                        combinedContent += content + "\n";
+                    }
+                    
+                    currentDownloadedCount++;
+                    ProcessNextInQueue();
+                }
+            };
+            EditorApplication.update += updateCallback;
         }
 
         private void SaveFile(string content)
         {
             var script = MonoScript.FromScriptableObject(this);
             string scriptPath = AssetDatabase.GetAssetPath(script);
-            string editorFolder = Path.GetDirectoryName(scriptPath);
-            string parentPath = Path.GetDirectoryName(editorFolder);
-            string resourcesPath = Path.Combine(parentPath, "Resources");
+            string resourcesPath = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(scriptPath)), "Resources");
 
             if (!Directory.Exists(resourcesPath)) Directory.CreateDirectory(resourcesPath);
 
-            string finalPath = Path.Combine(resourcesPath, settings.saveFileName + ".txt");
-            File.WriteAllText(finalPath, content);
+            File.WriteAllText(Path.Combine(resourcesPath, settings.saveFileName + ".txt"), content);
         
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             ResetManager();
+            Debug.Log($"<color=green>Localization Download Complete!</color> Merged {totalToDownload} sheets.");
         }
 
         private void ResetManager()
@@ -95,12 +122,10 @@ namespace ardat11_Localization
             if (settings != null)
             {
                 LocalizationManager.Initialize(settings);
-                // Refresh all UI elements in the scene immediately
                 foreach (var textElement in FindObjectsOfType<LocalizedText>())
                 {
                     textElement.Refresh();
                 }
-                Debug.Log("<color=yellow>Localization Manager and Scene UI have been reset.</color>");
             }
         }
     }

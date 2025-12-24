@@ -1,4 +1,4 @@
-Anahtar,Turkish,English,Spanish,French,German,Italian
+Key,Turkish,English,Spanish,French,German,Italian
 tr,Türkçe,Turkish,turco,turc,Türkisch,turco
 en,İngilizce,English,Inglés,Anglais,Englisch,Inglese
 es,İspanyol,Spanish,Español,Espagnol,Spanisch,spagnolo
@@ -23,11 +23,3 @@ settings.master,Usta,Master,Maestro,Maître,Master,Maestro
 settings.sfx,SFX,SFX,Efectos de sonido,SFX,SFX,Effetti sonori
 settings.music,Müzik,Music,Música,Musique,Musik,Musica
 settings.apply,Uygula,Apply,Aplicar,Appliquer,Anwenden,Fare domanda a
-button.startgame,Oyuna Başla,Start Game,Iniciar juego,Démarrer la partie,Spiel starten,Inizia il gioco
-button.newgame,Yeni Oyun,New Game,Nuevo juego,Nouveau jeu,Neues Spiel,Nuovo gioco
-button.hit,Vurmak,Hit,Golpear,Frapper,Schlag,Colpo
-button.stand,Durmak,Stand,Pararse,Rester,Stand,In piedi
-,,,,,,
-result.playerwin,Kazandınız,You Win,Tú ganas,Vous avez gagné,Du gewinnst!,Hai vinto
-result.dealerwin,Bayi Kazandı,Dealer Wins,El distribuidor gana,Le croupier gagne,Der Dealer gewinnt.,Il dealer vince
-result.tie,İtmek,Push,Empujar,Pousser,Drücken,Spingere

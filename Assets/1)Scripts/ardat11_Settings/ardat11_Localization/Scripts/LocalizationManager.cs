@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace ardat11_Localization
 {
     public static class LocalizationManager
     {
-        private static Dictionary<string, Dictionary<string, string>> _database =
-            new Dictionary<string, Dictionary<string, string>>();
-
+        private static Dictionary<string, string[]> _database = new Dictionary<string, string[]>();
+        private static Dictionary<string, int> _languageIndices = new Dictionary<string, int>();
         private static string _currentLanguage;
         private static LocalizationSettings _settings;
 
@@ -18,8 +18,12 @@ namespace ardat11_Localization
         {
             get
             {
-                if (string.IsNullOrEmpty(_currentLanguage)) CheckAndInitialize();
-                return _currentLanguage;
+                if (string.IsNullOrEmpty(_currentLanguage)) 
+                {
+                    CheckAndInitialize();
+                }
+                
+                return string.IsNullOrEmpty(_currentLanguage) ? "" : _currentLanguage;
             }
             set
             {
@@ -32,11 +36,16 @@ namespace ardat11_Localization
         {
             CheckAndInitialize();
 
+            string lang = CurrentLanguage;
+            if (string.IsNullOrEmpty(lang)) return $"MISSING_{key}";
+
             if (_database.TryGetValue(key, out var translations))
             {
-                return translations.ContainsKey(CurrentLanguage) ? translations[CurrentLanguage] : "NULL";
+                if (_languageIndices.TryGetValue(lang, out int index))
+                {
+                    return index < translations.Length ? translations[index] : "NULL";
+                }
             }
-
             return $"MISSING_{key}";
         }
 
@@ -51,12 +60,12 @@ namespace ardat11_Localization
             if (_database.Count == 0 || _settings == null)
             {
                 _settings = Resources.Load<LocalizationSettings>("LocalizationSettings");
-
                 if (_settings != null)
                 {
-                    // Note: We don't override _currentLanguage if it's already set by user
-                    if (string.IsNullOrEmpty(_currentLanguage)) _currentLanguage = _settings.defaultLanguage;
                     Initialize(_settings);
+                    
+                    if (string.IsNullOrEmpty(_currentLanguage)) 
+                        _currentLanguage = _settings.defaultLanguage;
                 }
             }
         }
@@ -65,6 +74,15 @@ namespace ardat11_Localization
         {
             _settings = settings;
             _database.Clear();
+            _languageIndices.Clear();
+
+            if (_settings.languageCodes != null)
+            {
+                for (int i = 0; i < _settings.languageCodes.Count; i++)
+                {
+                    _languageIndices[_settings.languageCodes[i]] = i;
+                }
+            }
 
             TextAsset asset = Resources.Load<TextAsset>(settings.saveFileName);
             if (asset != null)
@@ -77,21 +95,26 @@ namespace ardat11_Localization
         private static void Parse(string rawText)
         {
             string[] lines = rawText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length <= 1) return;
+
+            Regex csvParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
             for (int i = 1; i < lines.Length; i++)
             {
-                string[] cols = lines[i].Split(',');
+                string[] cols = csvParser.Split(lines[i]);
                 if (cols.Length < 2) continue;
 
-                string key = cols[0].Trim();
-                var dict = new Dictionary<string, string>();
+                string key = cols[0].Trim().Trim('"');
+                string[] translations = new string[_settings.languageCodes.Count];
 
                 for (int j = 0; j < _settings.languageCodes.Count; j++)
                 {
                     if (j + 1 < cols.Length)
-                        dict.Add(_settings.languageCodes[j], cols[j + 1].Trim());
+                    {
+                        translations[j] = cols[j + 1].Trim().Trim('"').Replace("\"\"", "\"");
+                    }
                 }
-
-                _database[key] = dict;
+                _database[key] = translations;
             }
         }
     }

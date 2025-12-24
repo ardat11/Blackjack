@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationSettings
   googleSheetsUrls:
   - https://docs.google.com/spreadsheets/d/e/2PACX-1vSjHSdiufIzoCOKvgvVBpk-EqTfPpUIY78pVsUNkT5IjwZGsZqcimqFdjj7UljS280PEz65mOEoViPr/pub?gid=0&single=true&output=csv
-  - https://docs.google.com/spreadsheets/d/e/2PACX-1vSjHSdiufIzoCOKvgvVBpk-EqTfPpUIY78pVsUNkT5IjwZGsZqcimqFdjj7UljS280PEz65mOEoViPr/pub?gid=868255358&single=true&output=csv
   defaultLanguage: tr
   languageCodes:
   - tr

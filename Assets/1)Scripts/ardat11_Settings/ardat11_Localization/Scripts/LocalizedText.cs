@@ -3,13 +3,12 @@ using TMPro;
 
 namespace ardat11_Localization
 {
-    [RequireComponent(typeof(TextMeshProUGUI))]
     public class LocalizedText : MonoBehaviour
     {
-        [Header("Settings")] public string localizationKey;
+        [Header("Settings")]
+        [SerializeField] private string localizationKey;
 
         [SerializeField] private TextMeshProUGUI _tmp;
-
 
         private void OnEnable()
         {
