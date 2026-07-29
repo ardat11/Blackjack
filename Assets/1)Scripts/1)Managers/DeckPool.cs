@@ -94,6 +94,7 @@ public class DeckPool : MonoBehaviour
         card.gameObject.SetActive(true);
         card.transform.SetParent(tr);
         card.transform.position = pos;
+        card.transform.rotation = Quaternion.identity;
         return card;
     }
 

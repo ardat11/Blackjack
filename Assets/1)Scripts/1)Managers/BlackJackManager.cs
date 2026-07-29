@@ -206,14 +206,13 @@ public class BlackJackManager : MonoBehaviour
 
         Vector3 targetPos = spawnPoint.position + new Vector3(cardSpacing * cardCount, 0, -0.01f * cardCount);
 
-        return deckTop.DOMove(targetPos, 0.5f).OnComplete(() =>
+        Card card = DeckPool.instance.GetFromPool(cardInfo, initialDeckPos, transform);
+
+        if (dealType == eDealType.ToDealer) dealerHand.Add(card);
+        else playerHand.Add(card);
+
+        return card.transform.DOMove(targetPos, 0.5f).OnComplete(() =>
         {
-            Card card = DeckPool.instance.GetFromPool(cardInfo, targetPos, transform);
-
-            if (dealType == eDealType.ToDealer) dealerHand.Add(card);
-            else playerHand.Add(card);
-
-            deckTop.position = initialDeckPos;
             UpdatePoint(card, dealType);
         });
     }
