@@ -32,6 +32,9 @@ public class BlackJackManager : MonoBehaviour
 
     private Card dealerSecretCard;
 
+    private eGameState currentState = eGameState.None;
+    private bool isAnimating = false;
+
     private void Awake()
     {
         InitDeck();
@@ -79,16 +82,27 @@ public class BlackJackManager : MonoBehaviour
 
     public void Hit()
     {
-        DealCard(eDealType.ToPlayer);
+        if (currentState != eGameState.PlayerTurn || isAnimating) return;
+        StartCoroutine(HitCoroutine());
+    }
+
+    private IEnumerator HitCoroutine()
+    {
+        isAnimating = true;
+        yield return StartCoroutine(DealCardCoroutine(eDealType.ToPlayer));
+        isAnimating = false;
     }
 
     public void Stand()
     {
+        if (currentState != eGameState.PlayerTurn || isAnimating) return;
         StartCoroutine(StandCoroutine());
     }
 
     public void NewGame()
     {
+        if (currentState != eGameState.RoundOver || isAnimating) return;
+        
         CheckDeckStatus();
         
         foreach (var card in dealerHand) DeckPool.instance.ReturnToPool(card);
@@ -119,6 +133,9 @@ public class BlackJackManager : MonoBehaviour
 
     private IEnumerator StandCoroutine()
     {
+        currentState = eGameState.DealerTurn;
+        isAnimating = true;
+
         bool isFlipDone = false;
         var cardInfo = playDeck.Dequeue();
 
@@ -146,35 +163,42 @@ public class BlackJackManager : MonoBehaviour
 
         while (dealerHandPoint < minPoints)
         {
-            DealCard(eDealType.ToDealer);
-            yield return new WaitForSeconds(0.8f);
+            yield return StartCoroutine(DealCardCoroutine(eDealType.ToDealer));
+            yield return new WaitForSeconds(0.5f);
         }
 
+        isAnimating = false;
         if (CheckCrash(eDealType.ToDealer)) yield break;
         CheckComparison();
     }
 
     private IEnumerator StartRoundCoroutine()
     {
+        currentState = eGameState.Initializing;
+        isAnimating = true;
+
         for (int i = 0; i < 2; i++)
         {
-            DealCard(eDealType.ToPlayer);
-            yield return new WaitForSeconds(0.6f);
+            yield return StartCoroutine(DealCardCoroutine(eDealType.ToPlayer));
+            yield return new WaitForSeconds(0.1f);
 
             (eCardRank, eCardSuit) dealerCardInfo = (i == 0) ? playDeck.Dequeue() : (eCardRank.CardBack, eCardSuit.CardBack);
-            OpenCardWithAnim(dealerCardInfo, eDealType.ToDealer);
-            yield return new WaitForSeconds(0.6f);
+            yield return OpenCardWithAnim(dealerCardInfo, eDealType.ToDealer).WaitForCompletion();
+            yield return new WaitForSeconds(0.1f);
         }
+
+        currentState = eGameState.PlayerTurn;
+        isAnimating = false;
     }
 
-    private void DealCard(eDealType dealType)
+    private IEnumerator DealCardCoroutine(eDealType dealType)
     {
         if (playDeck.Count == 0) ResetPlayDeck();
         (eCardRank, eCardSuit) cardInfo = playDeck.Dequeue();
-        OpenCardWithAnim(cardInfo, dealType);
+        yield return OpenCardWithAnim(cardInfo, dealType).WaitForCompletion();
     }
 
-    private void OpenCardWithAnim((eCardRank, eCardSuit) cardInfo, eDealType dealType)
+    private Tween OpenCardWithAnim((eCardRank, eCardSuit) cardInfo, eDealType dealType)
     {
         Vector3 initialDeckPos = deckTop.position;
         Transform spawnPoint = (dealType == eDealType.ToDealer) ? dealerCardSpawnPoint : playerCardSpawnPoint;
@@ -182,7 +206,7 @@ public class BlackJackManager : MonoBehaviour
 
         Vector3 targetPos = spawnPoint.position + new Vector3(cardSpacing * cardCount, 0, -0.01f * cardCount);
 
-        deckTop.DOMove(targetPos, 0.5f).OnComplete(() =>
+        return deckTop.DOMove(targetPos, 0.5f).OnComplete(() =>
         {
             Card card = DeckPool.instance.GetFromPool(cardInfo, targetPos, transform);
 
@@ -262,6 +286,7 @@ public class BlackJackManager : MonoBehaviour
 
     private void SetWinner(eDealType winnerType)
     {
+        currentState = eGameState.RoundOver;
         string msg = winnerType == eDealType.ToDealer ? "Dealer Wins!" :
                      winnerType == eDealType.ToPlayer ? "Player Wins!" : "Push!";
         
@@ -275,5 +300,14 @@ public enum eDealType
     ToDealer,
     ToPlayer,
     Nobody,
+}
+
+public enum eGameState
+{
+    None,
+    Initializing,
+    PlayerTurn,
+    DealerTurn,
+    RoundOver
 }
 
