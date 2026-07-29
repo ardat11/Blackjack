@@ -80,8 +80,16 @@ public class DeckPool : MonoBehaviour
         return card;
     }
     
-    public Card GetFromPool((eCardRank,eCardSuit) cardInfo,Vector3 pos,Transform tr)
+    public Card GetFromPool((eCardRank, eCardSuit) cardInfo, Vector3 pos, Transform tr)
     {
+        if (PoolDict[cardInfo].Count == 0)
+        {
+            for (int i = 0; i < creationSize; i++)
+            {
+                InstantiateCard(cardInfo);
+            }
+        }
+
         Card card = PoolDict[cardInfo].Dequeue();
         card.gameObject.SetActive(true);
         card.transform.SetParent(tr);

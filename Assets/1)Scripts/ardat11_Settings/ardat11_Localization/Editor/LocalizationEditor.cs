@@ -122,7 +122,7 @@ namespace ardat11_Localization
             if (settings != null)
             {
                 LocalizationManager.Initialize(settings);
-                foreach (var textElement in FindObjectsOfType<LocalizedText>())
+                foreach (var textElement in Object.FindObjectsByType<LocalizedText>(FindObjectsSortMode.None))
                 {
                     textElement.Refresh();
                 }

@@ -62,11 +62,10 @@ public class BlackJackManager : MonoBehaviour
 
     private void ShuffleDeck()
     {
-        System.Random rng = new System.Random();
         int n = gameDeck.Count;
         while (n > 1)
         {
-            int k = rng.Next(n--);
+            int k = UnityEngine.Random.Range(0, n--);
             (gameDeck[n], gameDeck[k]) = (gameDeck[k], gameDeck[n]);
         }
     }
